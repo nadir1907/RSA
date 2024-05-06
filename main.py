@@ -7,11 +7,13 @@ from sympy import mod_inverse
 # Geht nicht für die Zahl 462376535723, obwohl Prim
 
 
-def miller_robin(p):
+def miller_rabin(p):
     r = 0  # Zähler
+    # Wenn p 2 wird steht hier p-1 ist 1 und dann passt 2 bis 1 nicht mehr
     a = randrange(2, p - 1)  # Random Zahl
     s = p - 1  # Exponent von a, benötigt für Berechnung
 
+    
     #print("a = " + str(a))
     # Zerlge p-1 = 2^r*s
     while s % 2 == 0:
@@ -64,24 +66,29 @@ def generate_prime(bits):
     # Generiere Random Zahl
     prime = getrandbits(bits)
     # Check ob prim
-    while not miller_robin(prime):
+    while not miller_rabin(prime):
         prime = getrandbits(bits)
     return prime
 
 
 def generate_keys(bits):
     p = generate_prime(bits)
+    print("p " + str(p))
     q = generate_prime(bits)
+    print(str("q " + str(q)))
     n = p * q
     e = randint(2, n - 1)
     phi = (p - 1) * (q - 1)
+    print("phi = " + str(phi))
 
     # e muss prim sein und ggt 1
-    while not miller_robin(e) and gcd(e, phi) != 1:
+    while not miller_rabin(e) and gcd(e, phi) != 1:
         e = randint(2, n - 1)
 
+    print("e = " + str(e))
     # Exponent d berechnen
     d = mod_inverse(e, phi)
+    print("d= " + str(d))
 
     public_key = (n, e)
     private_key = (n, d)
@@ -91,6 +98,7 @@ def generate_keys(bits):
 
 def encrypt(message, public_key):
     n, e = public_key
+    print("aus encrypt: " + str(n) + " " + str(e))
     cipher = pow(message, e, n)
     return cipher
 
@@ -103,7 +111,7 @@ def decrypt(cipher, private_key):
 
 ######MAIN######
 
-bits = 1024
+bits = 4
 public_key, private_key = generate_keys(bits)
 
 m = "1231524"
