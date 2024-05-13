@@ -1,5 +1,5 @@
 ﻿from random import randrange, getrandbits, randint, choice
-from math import gcd
+from math import gcd, isqrt
 from sympy import mod_inverse
 import time
 
@@ -93,8 +93,8 @@ def encrypt(message, public_key):
 
 def decrypt(cipher, private_key):
     n, d = private_key
-    message = pow(cipher, d, n)
-    return message
+    # Where do i get p and q????
+    return chin_rest(p, q, d, cipher)
 
 
 def utf8_to_int(message):
@@ -106,10 +106,17 @@ def int_to_utf8(message):
 
 
 def chin_rest(p, q, d, encrypt):
-    m1 = q
-    m2 = p
+    m1 = p
+    m2 = q
     a1 = pow(encrypt, d % (m1 - 1), m1)
     a2 = pow(encrypt, d % (m2 - 1), m2)
+
+    q_inv = mod_inverse(m2, m1)
+    p_inv = mod_inverse(m1, m2)
+
+    decrypt_msg = (a1 * m2 * q_inv + a2 * m1 * p_inv) % (m1 * m2)
+    return decrypt_msg
+
 
 ######MAIN######
 
